@@ -1,0 +1,350 @@
+# HLS Transcoder Configuration
+# This file controls all aspects of video transcoding behavior
+# Place in: ~/.hls-transcoder.yaml, ~/.config/hls-transcoder/config.yaml, or ./.hls-transcoder.yaml
+
+# ============================================================================
+# Hardware Acceleration Settings
+# ============================================================================
+hardware:
+  # Preferred hardware encoder
+  # Options: auto, nvidia, intel, amd, apple, vaapi, software
+  # - auto: Automatically detect and use best available hardware
+  # - nvidia: Force NVIDIA NVENC (requires CUDA)
+  # - intel: Force Intel Quick Sync (QSV)
+  # - amd: Force AMD AMF (Windows/Linux)
+  # - apple: Force Apple VideoToolbox (macOS only)
+  # - vaapi: Force VA-API (Linux)
+  # - software: Force CPU encoding (libx264/libx265)
+  prefer: auto
+
+  # Fallback option if hardware encoding fails
+  # Options: software, none
+  # - software: Fall back to CPU encoding
+  # - none: Fail if hardware encoding unavailable
+  fallback: software
+
+  # Maximum concurrent hardware encoder instances
+  # Higher values = more parallel encoding but more GPU memory usage
+  # Recommended: 2-4 for consumer GPUs, 4-8 for professional GPUs
+  max_instances: 4
+
+# ============================================================================
+# Quality Profiles
+# Define presets for different quality/size trade-offs
+# ============================================================================
+profiles:
+  # Ultra profile - 4K content with maximum quality
+  # Best for: Premium content, archival, large screens
+  # Output size: ~1.5-2x source size
+  ultra:
+    - quality: 2160p # 4K Ultra HD
+      bitrate: 20000k # 20 Mbps
+      crf: 18 # Very high quality
+
+    - quality: 1440p # 2K QHD
+      bitrate: 16000k # 16 Mbps
+      crf: 20 # High quality
+
+    - quality: 1080p # Full HD
+      bitrate: 10000k # 10 Mbps
+      crf: 20 # High quality
+
+    - quality: 720p # HD
+      bitrate: 6000k # 6 Mbps
+      crf: 23 # Good quality
+
+    - quality: 480p # SD
+      bitrate: 3000k # 3 Mbps
+      crf: 26 # Medium quality
+
+    - quality: 360p # Low resolution
+      bitrate: 1000k # 1 Mbps
+      crf: 28 # Lower quality
+
+  # High profile - 1440p/1080p content with excellent quality
+  # Best for: High-quality streaming, premium users
+  # Output size: ~1x source size
+  high:
+    - quality: 1440p # 2K QHD
+      bitrate: 12000k # 12 Mbps
+      crf: 22 # High quality
+
+    - quality: 1080p # Full HD
+      bitrate: 8000k # 8 Mbps
+      crf: 20 # High quality
+
+    - quality: 720p # HD
+      bitrate: 5000k # 5 Mbps
+      crf: 23 # Good quality
+
+    - quality: 480p # SD
+      bitrate: 2500k # 2.5 Mbps
+      crf: 26 # Medium quality
+
+    - quality: 360p # Low resolution
+      bitrate: 1000k # 1 Mbps
+      crf: 28 # Lower quality
+
+  # Medium profile - Balanced quality and file size
+  # Best for: General streaming, standard users
+  # Output size: ~0.6-0.8x source size
+  medium:
+    - quality: 1080p # Full HD
+      bitrate: 5000k # 5 Mbps
+      crf: 23 # Good quality
+
+    - quality: 720p # HD
+      bitrate: 3000k # 3 Mbps
+      crf: 25 # Decent quality
+
+    - quality: 480p # SD
+      bitrate: 1500k # 1.5 Mbps
+      crf: 28 # Medium quality
+
+  # Low profile - Maximum compression
+  # Best for: Mobile devices, low bandwidth, storage-constrained
+  # Output size: ~0.4-0.5x source size
+  low:
+    - quality: 720p # HD
+      bitrate: 2000k # 2 Mbps
+      crf: 28 # Decent quality
+
+    - quality: 480p # SD
+      bitrate: 1000k # 1 Mbps
+      crf: 30 # Lower quality
+
+  # Custom profile example - Uncomment and modify as needed
+  # custom:
+  #   - quality: 1080p
+  #     bitrate: 6000k
+  #     crf: 22
+  #   - quality: 720p
+  #     bitrate: 4000k
+  #     crf: 24
+
+# ============================================================================
+# HLS (HTTP Live Streaming) Settings
+# ============================================================================
+hls:
+  # Duration of each video segment in seconds
+  # Shorter segments = faster seeking, more files, higher overhead
+  # Longer segments = fewer files, less overhead, slower seeking
+  # Recommended: 4-10 seconds
+  segment_duration: 6
+
+  # Playlist type
+  # Options: vod, event
+  # - vod: Video on Demand (seekable, finite length)
+  # - event: Live event (may grow over time)
+  playlist_type: vod
+
+  # Delete threshold for segments (for live streaming)
+  # Number of segments to keep before deleting old ones
+  # Set to 0 to keep all segments (recommended for VOD)
+  delete_threshold: 0
+
+# ============================================================================
+# Audio Settings
+# ============================================================================
+audio:
+  # Audio codec
+  # Options: aac, mp3, opus
+  # - aac: Best compatibility, good quality (recommended)
+  # - mp3: Universal compatibility, larger files
+  # - opus: Best quality/size ratio, limited compatibility
+  codec: aac
+
+  # Audio bitrate
+  # Recommended values:
+  # - 128k: Standard quality (stereo)
+  # - 192k: High quality (stereo)
+  # - 256k: Very high quality (stereo)
+  # - 384k: Excellent quality (5.1 surround)
+  bitrate: 128k
+
+  # Number of audio channels
+  # Options: auto, 1 (mono), 2 (stereo), 6 (5.1), 8 (7.1)
+  # - auto: Preserve original channel count from source (recommended)
+  # - 1: Downmix to mono
+  # - 2: Downmix to stereo (smaller files, wider compatibility)
+  # - 6: 5.1 surround sound (requires compatible source)
+  # - 8: 7.1 surround sound (requires compatible source)
+  channels: auto
+
+  # Audio sample rate in Hz
+  # Options: auto, 44100, 48000, 88200, 96000
+  # - auto: Preserve original sample rate from source (recommended)
+  # - 44100: CD quality
+  # - 48000: Standard (DVD/Blu-ray)
+  # - 96000: High-resolution audio
+  sample_rate: auto
+
+  # Audio segment duration in seconds
+  # Longer segments = fewer files, better performance, less overhead
+  # Shorter segments = more files, finer seeking granularity
+  # Recommended: 10 seconds (vs 6 for video)
+  segment_duration: 10
+
+  # Skip re-encoding if source audio is already compatible
+  # If source is AAC with matching settings, use stream copy (50-100x faster)
+  # Recommended: true
+  copy_if_possible: true
+
+# ============================================================================
+# Sprite Preview Thumbnails Settings
+# Generate thumbnail sprite sheets for video preview
+# ============================================================================
+sprites:
+  # Enable or disable sprite generation
+  enabled: true
+
+  # Interval between thumbnails in seconds
+  # Smaller values = more thumbnails, larger sprite files
+  # Larger values = fewer thumbnails, smaller sprite files
+  # Recommended: 5-15 seconds
+  interval: 10
+
+  # Thumbnail width in pixels
+  # Height will be calculated to maintain aspect ratio
+  # Recommended: 120-200 pixels
+  width: 160
+
+  # Thumbnail height in pixels
+  height: 90
+
+  # Number of columns in sprite sheet
+  # More columns = wider sprite image
+  columns: 10
+
+  # Number of rows in sprite sheet
+  # More rows = taller sprite image
+  rows: 10
+
+# ============================================================================
+# Performance & Optimization Settings
+# ============================================================================
+performance:
+  # Maximum number of parallel transcoding tasks
+  # Higher values = faster overall processing but more resource usage
+  # Recommended:
+  # - CPU encoding: Number of CPU cores / 2
+  # - GPU encoding: 2-4 for consumer GPUs, 4-8 for professional GPUs
+  max_parallel_tasks: 4
+
+  # FFmpeg thread queue size
+  # Larger values can help with complex filters but use more memory
+  # Recommended: 512-2048
+  thread_queue_size: 512
+
+  # Encoding preset (speed vs quality trade-off)
+  # Options (fastest to slowest):
+  # - ultrafast: Fastest, lowest quality
+  # - superfast: Very fast, low quality
+  # - veryfast: Fast, decent quality
+  # - faster: Above average speed, good quality
+  # - fast: Good speed, good quality
+  # - medium: Balanced (recommended)
+  # - slow: Slower, better quality
+  # - slower: Much slower, excellent quality
+  # - veryslow: Extremely slow, best quality
+  #
+  # Note: Hardware encoders have their own presets
+  preset: medium
+
+# ============================================================================
+# Output Settings
+# ============================================================================
+output:
+  # Create metadata.json file with transcoding information
+  # Includes: source info, variants, durations, file sizes, etc.
+  create_metadata: true
+
+  # Organize output files by type
+  # - true: Creates subdirectories (video/, audio/, subtitles/, sprites/)
+  # - false: All files in output root directory
+  organize_by_type: true
+
+  # Clean up temporary files after successful completion
+  # - true: Delete temp files (recommended)
+  # - false: Keep temp files for debugging
+  cleanup_temp: true
+# ============================================================================
+# Advanced Settings (Optional)
+# Uncomment and modify as needed
+# ============================================================================
+
+# Resolution handling
+# resolution:
+#   # Preserve original resolution as a variant
+#   include_original: true
+#
+#   # Allow upscaling to higher resolutions
+#   # Not recommended as it doesn't improve quality
+#   allow_upscaling: false
+#
+#   # Ensure output dimensions are divisible by this value
+#   # Most codecs require even dimensions (2)
+#   dimension_alignment: 2
+
+# Logging
+# logging:
+#   # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+#   level: INFO
+#
+#   # Log file location (null = no file logging)
+#   file: ~/.hls-transcoder.log
+#
+#   # Enable performance logging
+#   log_performance: true
+
+# Retry settings
+# retry:
+#   # Maximum retry attempts for failed tasks
+#   max_attempts: 3
+#
+#   # Delay between retries in seconds
+#   delay: 5
+#
+#   # Exponential backoff multiplier
+#   backoff: 2
+
+# ============================================================================
+# Notes & Tips
+# ============================================================================
+#
+# 1. Hardware Acceleration:
+#    - NVIDIA users: Ensure CUDA drivers are installed
+#    - Intel users: Install intel-media-driver (Linux) or update drivers (Windows)
+#    - AMD users: Install AMD drivers with AMF support
+#    - Apple users: VideoToolbox is built-in on macOS
+#
+# 2. Quality vs File Size:
+#    - Lower CRF = higher quality, larger files (range: 0-51)
+#    - Higher bitrate = higher quality, larger files
+#    - Profile selection: ultra > high > medium > low
+#
+# 3. Performance Optimization:
+#    - Use hardware acceleration when possible (5-10x faster)
+#    - Adjust max_parallel_tasks based on your system
+#    - Lower preset = faster encoding, slightly lower quality
+#
+# 4. Non-Standard Resolutions:
+#    - Tool automatically preserves aspect ratio
+#    - No upscaling by default (prevents quality loss)
+#    - Original resolution always available as variant
+#
+# 5. Bandwidth Recommendations:
+#    - 4K (2160p): 20+ Mbps
+#    - 1440p: 10-16 Mbps
+#    - 1080p: 5-10 Mbps
+#    - 720p: 3-5 Mbps
+#    - 480p: 1.5-2.5 Mbps
+#    - 360p: 0.8-1.5 Mbps
+#
+# 6. Testing Your Config:
+#    - Start with 'medium' profile for testing
+#    - Test a short video clip first
+#    - Monitor resource usage during transcoding
+#    - Adjust settings based on results
+#
+# ============================================================================

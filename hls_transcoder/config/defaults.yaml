@@ -1,0 +1,101 @@
+# HLS Transcoder Configuration
+
+# Hardware Acceleration
+hardware:
+  prefer: auto # auto, nvenc, qsv, vaapi, amf, videotoolbox, none
+  fallback: software # Use software encoding if HW fails
+  max_instances: 4 # Max concurrent HW encoder instances
+
+# Quality Profiles
+profiles:
+  ultra:
+    - quality: 2160p
+      bitrate: 20000k
+      crf: 18
+    - quality: 1440p
+      bitrate: 16000k
+      crf: 20
+    - quality: 1080p
+      bitrate: 10000k
+      crf: 20
+    - quality: 720p
+      bitrate: 6000k
+      crf: 23
+    - quality: 480p
+      bitrate: 3000k
+      crf: 26
+    - quality: 360p
+      bitrate: 1000k
+      crf: 28
+
+  high:
+    - quality: 1440p
+      bitrate: 12000k
+      crf: 22
+    - quality: 1080p
+      bitrate: 8000k
+      crf: 20
+    - quality: 720p
+      bitrate: 5000k
+      crf: 23
+    - quality: 480p
+      bitrate: 2500k
+      crf: 26
+    - quality: 360p
+      bitrate: 1000k
+      crf: 28
+
+  medium:
+    - quality: 1080p
+      bitrate: 5000k
+      crf: 23
+    - quality: 720p
+      bitrate: 3000k
+      crf: 25
+    - quality: 480p
+      bitrate: 1500k
+      crf: 28
+
+  low:
+    - quality: 720p
+      bitrate: 2000k
+      crf: 28
+    - quality: 480p
+      bitrate: 1000k
+      crf: 30
+
+# HLS Settings
+hls:
+  segment_duration: 6 # seconds
+  playlist_type: vod # vod or event
+  delete_threshold: 0 # Keep all segments
+
+# Audio Settings
+audio:
+  codec: aac
+  bitrate: 128k
+  channels: auto # auto = preserve source channels (recommended)
+  sample_rate: auto # auto = preserve source sample rate (recommended)
+  segment_duration: 6 # Audio segment duration in seconds (longer = fewer files, better performance)
+  copy_if_possible: true # Skip re-encoding if source is compatible (much faster)
+
+# Sprite Settings
+sprites:
+  enabled: true
+  interval: 10 # seconds
+  width: 160
+  height: 90
+  columns: 10
+  rows: 10
+
+# Performance
+performance:
+  max_parallel_tasks: 4
+  thread_queue_size: 512
+  preset: medium # ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+
+# Output
+output:
+  create_metadata: true
+  organize_by_type: true
+  cleanup_temp: true
